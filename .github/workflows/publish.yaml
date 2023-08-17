@@ -1,0 +1,32 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  
+jobs:
+  build:
+    name: Publish binaries
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build
+      run: make all
+
+    - name: Gen note
+      run: shasum -a 256 dist/* > Release.txt
+      
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: Release.txt
+        files: |
+          dist/kontainer-engine-driver-oke-darwin
+          dist/kontainer-engine-driver-oke-linux
+          dist/kontainer-engine-driver-oke-linux-arm64
